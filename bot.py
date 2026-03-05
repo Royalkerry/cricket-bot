@@ -3,8 +3,8 @@ import requests
 import os
 
 # Render par variables set karenge, isliye yahan direct token mat likhna
-BOT_TOKEN = os.environ.get('8290843314:AAH9OjlfB-D6zBiCUs1nwuEopqKW_cCHAZ0')
-API_KEY = os.environ.get('ced95e87-9652-4913-b5e6-9b3bd2c7561c')
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+API_KEY = os.environ.get('CRICKET_API_KEY')
 
 bot = telebot.TeleBot(BOT_TOKEN)
 
