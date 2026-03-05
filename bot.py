@@ -1,28 +1,38 @@
 import telebot
 import requests
 import os
+from flask import Flask
+from threading import Thread
 
-# Render par variables set karenge, isliye yahan direct token mat likhna
+# Flask setup (UptimeRobot ke liye)
+app = Flask('')
+@app.route('/')
+def home():
+    return "Bot is Alive!"
+
+def run():
+    app.run(host='0.0.0.0', port=8080)
+
+# Bot setup
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
 API_KEY = os.environ.get('CRICKET_API_KEY')
-
 bot = telebot.TeleBot(BOT_TOKEN)
-
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    bot.reply_to(message, "Cricket Bot chalu hai! Score ke liye /score likho.")
 
 @bot.message_handler(commands=['score'])
 def get_score(message):
     url = f"https://api.cricapi.com/v1/cricScore?apikey={API_KEY}"
-    try:
-        data = requests.get(url).json()
-        matches = data.get('data', [])
-        msg = "🏏 *Live Scores:*\n\n"
-        for m in matches[:5]:
-            msg += f"📌 {m['t1']} vs {m['t2']}\nScore: {m['ms']}\n\n"
-        bot.send_message(message.chat.id, msg, parse_mode="Markdown")
-    except:
-        bot.reply_to(message, "API error! Baad mein koshish karein.")
+    data = requests.get(url).json()
+    matches = data.get('data', [])
+    msg = "🏏 *Live Scores:*\n\n"
+    for m in matches[:5]:
+        msg += f"📌 {m['t1']} vs {m['t2']}\nScore: {m['ms']}\n\n"
+    bot.send_message(message.chat.id, msg, parse_mode="Markdown")
 
-bot.infinity_polling()
+# Dono ko saath chalane ke liye thread use karenge
+def start_bot():
+    bot.infinity_polling()
+
+if __name__ == "__main__":
+    t = Thread(target=run)
+    t.start()
+    start_bot()
